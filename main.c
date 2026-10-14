@@ -17,7 +17,7 @@
 #include <errno.h>
 #include <ctype.h>
 
-#define MAX_STUDENTS 100
+#define MAX_STUDENTS 72
 #define SUBJECT_COUNT 5
 #define NAME_LENGTH 60
 #define MAX_MARKS_PER_SUBJECT 20
@@ -40,7 +40,7 @@ static const Subject subjects[SUBJECT_COUNT] = {
 };
 
 typedef struct {
-    int roll_number;
+    int roll_number; /* Sequence number 1-72; displayed as CS26001-CS26072. */
     char name[NAME_LENGTH];
     int marks[SUBJECT_COUNT];
     int total;
@@ -95,6 +95,32 @@ static int read_int_range(const char *prompt, int minimum, int maximum) {
 
         return (int)value;
     }
+}
+
+static int read_roll_number(const char *prompt) {
+    char input[128];
+
+    for (;;) {
+        read_line(prompt, input, sizeof(input));
+
+        /* Expected format: CS26001 through CS26072. */
+        if (strlen(input) == 7 && strncmp(input, "CS26", 4) == 0 &&
+            isdigit((unsigned char)input[4]) &&
+            isdigit((unsigned char)input[5]) &&
+            isdigit((unsigned char)input[6])) {
+            int sequence = (input[4] - '0') * 100 +
+                           (input[5] - '0') * 10 + (input[6] - '0');
+            if (sequence >= 1 && sequence <= MAX_STUDENTS) {
+                return sequence;
+            }
+        }
+
+        printf("Invalid roll number. Enter a number from CS26001 to CS26072.\n");
+    }
+}
+
+static void print_roll_number(int roll_number) {
+    printf("CS26%03d", roll_number);
 }
 
 static void read_student_name(char *name, size_t size) {
@@ -178,7 +204,9 @@ static int get_rank(const Student *student) {
 
 static void print_student_details(const Student *student) {
     printf("\nStudent: %s\n", student->name);
-    printf("Roll number: %d\n", student->roll_number);
+    printf("Roll number: ");
+    print_roll_number(student->roll_number);
+    printf("\n");
     printf("---------------------------------------------\n");
 
     for (int i = 0; i < SUBJECT_COUNT; i++) {
@@ -207,7 +235,7 @@ static void add_student(void) {
     printf("--------------------\n");
 
     new_student.roll_number =
-        read_int_range("Roll number (1-999999): ", 1, 999999);
+        read_roll_number("Roll number (CS26001-CS26072): ");
 
     if (find_student_index(new_student.roll_number) != -1) {
         printf("That roll number is already in the records.\n");
@@ -265,7 +293,7 @@ static void display_rank_list(void) {
 
     for (int i = 0; i < student_count; i++) {
         const Student *student = &students[order[i]];
-        printf("%-6d %-9d %-22.22s %3d/%-5d %-11.2f%% %-7s %-7s\n",
+        printf("%-6d CS26%03d %-22.22s %3d/%-5d %10.2f%% %-7s %-7s\n",
                get_rank(student), student->roll_number, student->name,
                student->total, TOTAL_MAX_MARKS, student->percentage,
                student->grade, student->passed ? "PASS" : "FAIL");
@@ -279,11 +307,11 @@ static void search_student(void) {
     }
 
     int roll_number =
-        read_int_range("\nEnter roll number to search: ", 1, 999999);
+        read_roll_number("\nEnter roll number to search (CS26001-CS26072): ");
     int index = find_student_index(roll_number);
 
     if (index == -1) {
-        printf("No student found with roll number %d.\n", roll_number);
+        printf("No student found with roll number CS26%03d.\n", roll_number);
         return;
     }
 
@@ -324,7 +352,7 @@ static void show_class_summary(void) {
     printf("Students passed: %d\n", passed_count);
     printf("Students failed: %d\n", student_count - passed_count);
     printf("Pass percentage: %.2f%%\n", pass_percentage);
-    printf("Topper: %s (Roll No. %d, %.2f%%)\n",
+    printf("Topper: %s (Roll No. CS26%03d, %.2f%%)\n",
            students[topper_index].name,
            students[topper_index].roll_number,
            students[topper_index].percentage);
@@ -347,6 +375,7 @@ static void show_project_info(void) {
     printf("In-Semester 1: five subjects, each out of %d marks.\n",
            MAX_MARKS_PER_SUBJECT);
     printf("Maximum total: %d marks.\n", TOTAL_MAX_MARKS);
+    printf("Branch roll-number range: CS26001 to CS26072 (72 students).\n");
     printf("Example pass threshold: at least %d/%d in each subject.\n",
            PASS_MARKS_PER_SUBJECT, MAX_MARKS_PER_SUBJECT);
     printf("Grades: A+ (90+), A (80+), B (70+), C (60+), D (50+), E (35+), F (failed subject).\n");
@@ -367,6 +396,7 @@ static void show_menu(void) {
 int main(void) {
     printf("KITS Student Rank Calculator\n");
     printf("CSE (AI/ML) | KITS Ramtek\n");
+    printf("Roll numbers supported: CS26001 to CS26072\n");
 
     for (;;) {
         show_menu();

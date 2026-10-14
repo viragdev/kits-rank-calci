@@ -1,19 +1,16 @@
 # KITS Student Rank Calculator 🎓
 
-A simple C project I built as a first-year CSE (AI/ML) student at **Kavikulaguru Institute of Technology and Science (KITS), Ramtek**.
-
-The idea is to make student result calculations easier while practising the concepts I'm learning in PSC.
+A small C project for my In-Semester 1 exams at **KITS Ramtek**. Each of the five subjects is out of 20, so the maximum total is 100.
 
 ## Features
 
-- Add student details and subject marks
-- Calculate total, percentage, grade, and pass/fail status
-- View the class rank list
-- Search students by roll number
+- Enter marks for all five subjects
+- Calculate total, percentage, grade, and pass/fail
+- View class rankings and search by roll number
 - Check class average, topper, and pass percentage
 - Validate marks and prevent duplicate roll numbers
 
-## Subjects and Faculty
+## Subjects
 
 | Code | Subject | Faculty |
 |---|---|---|
@@ -23,32 +20,19 @@ The idea is to make student result calculations easier while practising the conc
 | BE | Biology for Engineers | Savyasachi Sir |
 | BEE | Basics of Electronics Engineering | Viplov Dhoke Sir |
 
-## Run the Project
+## Run on Windows
 
-You'll need GCC or another C compiler.
+Install GCC, open PowerShell in this folder, and run:
 
-**Windows (GCC):**
-
-```bash
+```powershell
 gcc -std=c11 -Wall -Wextra -Wpedantic main.c -o kits_student_rank_calculator.exe
 .\kits_student_rank_calculator.exe
 ```
 
-## Concepts Used
+## Notes
 
-C basics, loops, conditional statements, arrays, strings, structures, functions, pointers, searching, and sorting.
+- The program uses example grading rules: 7/20 or more in each subject to pass, and overall percentage for the grade. These are **not confirmed official KITS rules**.
+- Records are kept in memory and are cleared when the program exits.
+- Built using C fundamentals, functions, arrays, structures, loops, searching, and sorting.
 
-## Note
-
-This project uses sample grading rules for demonstration. Student records are stored in memory and are cleared when the program exits.
-
-## Future Improvements
-
-- Save records using file handling
-- Edit and delete student records
-- Add subject-wise statistics
-- Export results to CSV
-
----
-
-Made as a learning project while exploring C programming at KITS Ramtek.
+Made as a first-year C programming project.

@@ -5,8 +5,8 @@
  * College: Kavikulaguru Institute of Technology and Science (KITS), Ramtek
  * Branch: CSE (AI/ML)
  *
- * This program records marks for five first-semester subjects, calculates
- * results, ranks students by percentage, and displays class statistics.
+ * This version is configured for In-Semester 1: five subjects, each out of 20.
+ * It calculates results, ranks students by percentage, and displays statistics.
  *
  * Student records are kept in memory for the current run only.
  */
@@ -20,7 +20,10 @@
 #define MAX_STUDENTS 100
 #define SUBJECT_COUNT 5
 #define NAME_LENGTH 60
-#define PASS_MARKS 35
+#define MAX_MARKS_PER_SUBJECT 20
+#define TOTAL_MAX_MARKS (SUBJECT_COUNT * MAX_MARKS_PER_SUBJECT)
+/* Example threshold only: 35% of 20 = 7. Confirm official exam rules. */
+#define PASS_MARKS_PER_SUBJECT 7
 
 typedef struct {
     const char *code;
@@ -135,13 +138,13 @@ static void calculate_result(Student *student) {
 
     for (int i = 0; i < SUBJECT_COUNT; i++) {
         student->total += student->marks[i];
-        if (student->marks[i] < PASS_MARKS) {
+        if (student->marks[i] < PASS_MARKS_PER_SUBJECT) {
             student->passed = 0;
         }
     }
 
     student->percentage =
-        (float)student->total / (SUBJECT_COUNT * 100) * 100.0f;
+        (float)student->total / TOTAL_MAX_MARKS * 100.0f;
 
     if (!student->passed) {
         strcpy(student->grade, "F");
@@ -179,11 +182,12 @@ static void print_student_details(const Student *student) {
     printf("---------------------------------------------\n");
 
     for (int i = 0; i < SUBJECT_COUNT; i++) {
-        printf("%s (%s): %d/100\n",
-               subjects[i].code, subjects[i].name, student->marks[i]);
+        printf("%s (%s): %d/%d\n",
+               subjects[i].code, subjects[i].name, student->marks[i],
+               MAX_MARKS_PER_SUBJECT);
     }
 
-    printf("Total: %d/%d\n", student->total, SUBJECT_COUNT * 100);
+    printf("Total: %d/%d\n", student->total, TOTAL_MAX_MARKS);
     printf("Percentage: %.2f%%\n", student->percentage);
     printf("Grade: %s\n", student->grade);
     printf("Result: %s\n", student->passed ? "PASS" : "FAIL");
@@ -212,12 +216,13 @@ static void add_student(void) {
 
     read_student_name(new_student.name, sizeof(new_student.name));
 
-    printf("\nEnter marks out of 100 for each subject.\n");
+    printf("\nIn-Semester 1: enter marks out of %d for each subject.\n",
+           MAX_MARKS_PER_SUBJECT);
     for (int i = 0; i < SUBJECT_COUNT; i++) {
         char prompt[180];
         snprintf(prompt, sizeof(prompt), "%s - %s: ",
                  subjects[i].code, subjects[i].name);
-        new_student.marks[i] = read_int_range(prompt, 0, 100);
+        new_student.marks[i] = read_int_range(prompt, 0, MAX_MARKS_PER_SUBJECT);
     }
 
     calculate_result(&new_student);
@@ -262,7 +267,7 @@ static void display_rank_list(void) {
         const Student *student = &students[order[i]];
         printf("%-6d %-9d %-22.22s %3d/%-5d %-11.2f%% %-7s %-7s\n",
                get_rank(student), student->roll_number, student->name,
-               student->total, SUBJECT_COUNT * 100, student->percentage,
+               student->total, TOTAL_MAX_MARKS, student->percentage,
                student->grade, student->passed ? "PASS" : "FAIL");
     }
 }
@@ -308,7 +313,7 @@ static void show_class_summary(void) {
     }
 
     float class_average =
-        (float)total_marks / (student_count * SUBJECT_COUNT);
+        (float)total_marks / (student_count * TOTAL_MAX_MARKS) * 100.0f;
     float pass_percentage =
         (float)passed_count / student_count * 100.0f;
 
@@ -339,11 +344,13 @@ static void show_project_info(void) {
 
     printf("\nProject rules\n");
     printf("-------------\n");
-    printf("Five subjects, each out of 100 marks.\n");
-    printf("A student must score at least %d in every subject to pass.\n",
-           PASS_MARKS);
+    printf("In-Semester 1: five subjects, each out of %d marks.\n",
+           MAX_MARKS_PER_SUBJECT);
+    printf("Maximum total: %d marks.\n", TOTAL_MAX_MARKS);
+    printf("Example pass threshold: at least %d/%d in each subject.\n",
+           PASS_MARKS_PER_SUBJECT, MAX_MARKS_PER_SUBJECT);
     printf("Grades: A+ (90+), A (80+), B (70+), C (60+), D (50+), E (35+), F (failed subject).\n");
-    printf("These are project rules for demonstration, not official KITS grading rules.\n");
+    printf("Pass and grade rules are examples, not official KITS rules.\n");
     printf("Records remain in memory and are cleared when the program exits.\n");
 }
 
